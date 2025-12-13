@@ -17,7 +17,7 @@
             <h1 class="text-4xl font-bold mb-2">🎯 Polymarket Up Down Bot Dashboard</h1>
             <p class="text-gray-200">Automated trading bot for crypto UP/DOWN markets - Real-time monitoring across 12 wallets</p>
             <div class="mt-3 text-sm text-gray-100">
-                <p>🤖 Auto-trading BTC, ETH, SOL, XRP UP/DOWN markets | 📊 Live data every 30 seconds | ⚡ 24/7 Operation</p>
+                <p>🤖 Auto-trading BTC, ETH, SOL, XRP UP/DOWN markets | 📊 Data updates every 8 hours | ⚡ 24/7 Operation</p>
             </div>
             <div class="mt-4">
                 <button onclick="refreshData()" class="bg-white text-blue-700 hover:bg-gray-100 px-6 py-3 rounded-lg text-lg font-semibold">
@@ -157,8 +157,8 @@
             }
         }
 
-        // Auto-refresh every 30 seconds
-        setInterval(refreshData, 30000);
+        // Auto-refresh every 8 hours (28800000 milliseconds)
+        setInterval(refreshData, 28800000);
 
         // Initial load
         window.addEventListener('DOMContentLoaded', refreshData);
