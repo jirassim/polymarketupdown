@@ -1,0 +1,24 @@
+# Sensitive files
+.env
+*.log
+contact_requests.txt
+gmail_password.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
