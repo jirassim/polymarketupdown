@@ -8,16 +8,16 @@ from polymarket_apis.clients import PolymarketDataClient
 WALLET_ADDRESSES = [
     {'number': 1, 'funder': '0x707a2F7bB884E45bF5AA26f0dC44aA3aE309D4ff'},
     {'number': 2, 'funder': '0xdA31710a25Ef1544F31bC014a32b8c6b107b74D0'},
-    {'number': 3, 'funder': '0x8eF6726670e61E88146D89e49B03c9b00b4C885F'},
-    {'number': 4, 'funder': '0x2E7F3B55cb67B14a80f2c61D23bDc7C1e6b8F1dA'},
-    {'number': 5, 'funder': '0x9A3b5C8D4F2E1B7a6C8d5E3F1A2B4C6D8E9F0A1B'},
-    {'number': 6, 'funder': '0x1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6F7A8B9C0D'},
-    {'number': 7, 'funder': '0x5F8e3c2A1b9D6E4f7C0A2B3D4E5F6A7B8C9D0E1F'},
-    {'number': 8, 'funder': '0x3B4C5D6E7F8A9B0C1D2E3F4A5B6C7D8E9F0A1B2C'},
-    {'number': 9, 'funder': '0x7A8B9C0D1E2F3A4B5C6D7E8F9A0B1C2D3E4F5A6B'},
-    {'number': 10, 'funder': '0x0E1F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6C7D8E9F'},
-    {'number': 11, 'funder': '0x4D5E6F7A8B9C0D1E2F3A4B5C6D7E8F9A0B1C2D3E'},
-    {'number': 12, 'funder': '0x6C7D8E9F0A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D'}
+    {'number': 3, 'funder': '0x5ef82699d9ffd7a5a092cad77cd6b07dae52b33e'},
+    {'number': 4, 'funder': '0x2ad5198d59f6088819a52aeffa11bddb62f495c1'},
+    {'number': 5, 'funder': '0xdb9c2e152d90fc79f92da47b8b22e36e8480a8be'},
+    {'number': 6, 'funder': '0x059ebc6734c0a0af9ddd72bf3213250c0a653f67'},
+    {'number': 7, 'funder': '0x05B1822C0702a85ac7F603409AB0061F80fD06e6'},
+    {'number': 8, 'funder': '0x1f6a48dfac186A4a841f86439D4660C900FD2b18'},
+    {'number': 9, 'funder': '0x2bd58cffc23ce88efc7e6d20eb5802f57360c2fa'},
+    {'number': 10, 'funder': '0x2631bf72fedf7ac3b20632c0d3223e4cd865cc94'},
+    {'number': 11, 'funder': '0x935714939bb64cf43e460b76ebd93734ab200d8f'},
+    {'number': 12, 'funder': '0x7883ee83b91ed33a905bcdcb9d6762b8f7f6df7d'}
 ]
 
 def fetch_wallet_stats(funder_address):
