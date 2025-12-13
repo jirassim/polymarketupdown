@@ -1,9 +1,4 @@
-#!/usr/bin/env python3
-"""
-Vercel Serverless Function - Fetch wallet data from Polymarket
-Based on final_dashboard.py
-"""
-
+from http.server import BaseHTTPRequestHandler
 import json
 import time
 from datetime import datetime
@@ -60,49 +55,43 @@ def fetch_wallet_stats(funder_address):
             'status': 'Error'
         }
 
-def handler(request, context=None):
-    """Vercel serverless function handler"""
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        wallet_stats = []
+        total_volume = 0
+        total_pnl = 0
+        total_trades = 0
+        active_count = 0
 
-    wallet_stats = []
-    total_volume = 0
-    total_pnl = 0
-    total_trades = 0
-    active_count = 0
+        for wallet in WALLET_ADDRESSES:
+            stats = fetch_wallet_stats(wallet['funder'])
+            stats['number'] = wallet['number']
 
-    for wallet in WALLET_ADDRESSES:
-        stats = fetch_wallet_stats(wallet['funder'])
-        stats['number'] = wallet['number']
+            wallet_stats.append(stats)
 
-        wallet_stats.append(stats)
+            # Calculate totals
+            total_volume += stats['volume']
+            total_pnl += stats['pnl']
+            total_trades += stats['trades']
+            if stats['status'] == 'Active':
+                active_count += 1
 
-        # Calculate totals
-        total_volume += stats['volume']
-        total_pnl += stats['pnl']
-        total_trades += stats['trades']
-        if stats['status'] == 'Active':
-            active_count += 1
+            # Small delay to avoid rate limits
+            time.sleep(0.3)
 
-        # Small delay to avoid rate limits
-        time.sleep(0.3)
+        response_data = {
+            'wallets': wallet_stats,
+            'summary': {
+                'total_volume': total_volume,
+                'total_pnl': total_pnl,
+                'total_trades': total_trades,
+                'active_wallets': active_count
+            },
+            'timestamp': datetime.now().isoformat()
+        }
 
-    response_data = {
-        'wallets': wallet_stats,
-        'summary': {
-            'total_volume': total_volume,
-            'total_pnl': total_pnl,
-            'total_trades': total_trades,
-            'active_wallets': active_count
-        },
-        'timestamp': datetime.now().isoformat()
-    }
-
-    return {
-        'statusCode': 200,
-        'headers': {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type'
-        },
-        'body': json.dumps(response_data)
-    }
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        self.wfile.write(json.dumps(response_data).encode())

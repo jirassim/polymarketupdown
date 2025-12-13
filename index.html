@@ -106,8 +106,7 @@
         async function refreshData() {
             try {
                 const response = await fetch('/api/wallets');
-                const result = await response.json();
-                const data = JSON.parse(result.body);
+                const data = await response.json();
 
                 // Update summary
                 document.getElementById('totalVolume').textContent = formatCurrency(data.summary.total_volume);
