@@ -3,309 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polymarket Trading Bot Dashboard</title>
-
-    <!-- Tailwind CSS -->
+    <title>🎯 Polymarket Up Down Bot - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .neon-green {
-            color: #39FF14;
-            text-shadow: 0 0 10px #39FF14;
-        }
-        .neon-red {
-            color: #FF073A;
-            text-shadow: 0 0 10px #FF073A;
-        }
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
+        .loading { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="gradient-bg min-h-screen">
-    <!-- Navigation -->
-    <nav class="glass-effect p-4 mb-6">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <i class="fas fa-chart-line text-3xl text-white"></i>
-                <h1 class="text-2xl font-bold text-white">Polymarket Bot Dashboard</h1>
+<body class="bg-gray-900 text-white">
+    <div class="container mx-auto p-4">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-green-700 to-blue-700 rounded-lg p-6 mb-6">
+            <h1 class="text-4xl font-bold mb-2">🎯 Polymarket Up Down Bot Dashboard</h1>
+            <p class="text-gray-200">Automated trading bot for crypto UP/DOWN markets - Real-time monitoring across 12 wallets</p>
+            <div class="mt-3 text-sm text-gray-100">
+                <p>🤖 Auto-trading BTC, ETH, SOL, XRP UP/DOWN markets | 📊 Live data every 30 seconds | ⚡ 24/7 Operation</p>
             </div>
-            <div class="flex items-center space-x-4">
-                <span id="connectionStatus" class="text-white flex items-center">
-                    <i class="fas fa-circle text-green-400 mr-2 pulse-animation"></i> Live
-                </span>
-                <button onclick="showRegisterModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
-                    <i class="fas fa-user-plus mr-2"></i>Register Bot
+            <div class="mt-4">
+                <button onclick="refreshData()" class="bg-white text-blue-700 hover:bg-gray-100 px-6 py-3 rounded-lg text-lg font-semibold">
+                    🔄 Refresh Data
                 </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Container -->
-    <div class="container mx-auto px-4">
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <!-- Total Volume Card -->
-            <div class="glass-effect rounded-lg p-6 card-hover animate__animated animate__fadeInUp">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-300 text-sm">Total Volume (24h)</p>
-                        <h2 class="text-3xl font-bold text-white" id="totalVolume">$0</h2>
-                        <p class="text-green-400 text-sm mt-1">
-                            <i class="fas fa-arrow-up"></i> <span id="volumeChange">+0%</span>
-                        </p>
-                    </div>
-                    <i class="fas fa-dollar-sign text-4xl text-green-400 opacity-50"></i>
-                </div>
-            </div>
-
-            <!-- Active Wallets Card -->
-            <div class="glass-effect rounded-lg p-6 card-hover animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-300 text-sm">Active Wallets</p>
-                        <h2 class="text-3xl font-bold text-white" id="activeWallets">0/12</h2>
-                        <p class="text-blue-400 text-sm mt-1">
-                            <i class="fas fa-wallet"></i> <span id="walletStatus">All systems go</span>
-                        </p>
-                    </div>
-                    <i class="fas fa-users text-4xl text-blue-400 opacity-50"></i>
-                </div>
-            </div>
-
-            <!-- Total Trades Card -->
-            <div class="glass-effect rounded-lg p-6 card-hover animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-300 text-sm">Total Trades (24h)</p>
-                        <h2 class="text-3xl font-bold text-white" id="totalTrades">0</h2>
-                        <p class="text-yellow-400 text-sm mt-1">
-                            <i class="fas fa-exchange-alt"></i> <span id="tradesPerHour">0/hr</span>
-                        </p>
-                    </div>
-                    <i class="fas fa-chart-bar text-4xl text-yellow-400 opacity-50"></i>
-                </div>
-            </div>
-
-            <!-- Win Rate Card -->
-            <div class="glass-effect rounded-lg p-6 card-hover animate__animated animate__fadeInUp" style="animation-delay: 0.3s">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-300 text-sm">Win Rate</p>
-                        <h2 class="text-3xl font-bold text-white" id="winRate">0%</h2>
-                        <p class="text-purple-400 text-sm mt-1">
-                            <i class="fas fa-trophy"></i> <span id="profitLoss">$0</span> P&L
-                        </p>
-                    </div>
-                    <i class="fas fa-percentage text-4xl text-purple-400 opacity-50"></i>
-                </div>
+                <span class="ml-4 text-sm">Last updated: <span id="lastUpdate">Never</span></span>
             </div>
         </div>
 
-        <!-- Wallets Grid -->
-        <div class="mb-6">
-            <h2 class="text-xl font-bold text-white mb-4">
-                <i class="fas fa-wallet mr-2"></i>Wallet Performance
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4" id="walletsGrid">
-                <!-- Wallet cards will be dynamically inserted here -->
+        <!-- Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-gray-800 rounded-lg p-4">
+                <div class="text-gray-400 text-sm">📊 Total Volume</div>
+                <div id="totalVolume" class="text-3xl font-bold">Loading...</div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4">
+                <div class="text-gray-400 text-sm">💵 Total P&L</div>
+                <div id="totalPnL" class="text-3xl font-bold">Loading...</div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4">
+                <div class="text-gray-400 text-sm">📈 Total Trades</div>
+                <div id="totalTrades" class="text-3xl font-bold">0</div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4">
+                <div class="text-gray-400 text-sm">✅ Active Wallets</div>
+                <div id="activeWallets" class="text-3xl font-bold">0</div>
             </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <!-- Volume Chart -->
-            <div class="glass-effect rounded-lg p-6 animate__animated animate__fadeInLeft">
-                <h3 class="text-lg font-bold text-white mb-4">
-                    <i class="fas fa-chart-line mr-2"></i>24h Volume Trend
-                </h3>
-                <canvas id="volumeChart"></canvas>
-            </div>
-
-            <!-- Position Distribution -->
-            <div class="glass-effect rounded-lg p-6 animate__animated animate__fadeInRight">
-                <h3 class="text-lg font-bold text-white mb-4">
-                    <i class="fas fa-chart-pie mr-2"></i>Position Distribution
-                </h3>
-                <canvas id="positionChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Recent Trades Table -->
-        <div class="glass-effect rounded-lg p-6 mb-6 animate__animated animate__fadeInUp">
-            <h3 class="text-lg font-bold text-white mb-4">
-                <i class="fas fa-history mr-2"></i>Recent Trades
-            </h3>
+        <!-- Wallets Table -->
+        <div class="bg-gray-800 rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">📋 All 12 Wallets</h2>
             <div class="overflow-x-auto">
-                <table class="w-full text-white">
+                <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b border-gray-600">
-                            <th class="text-left p-2">Time</th>
-                            <th class="text-left p-2">Wallet</th>
-                            <th class="text-left p-2">Market</th>
-                            <th class="text-left p-2">Side</th>
-                            <th class="text-right p-2">Amount</th>
-                            <th class="text-right p-2">Price</th>
-                            <th class="text-center p-2">Status</th>
+                        <tr class="border-b-2 border-gray-700">
+                            <th class="text-left py-3">Wallet</th>
+                            <th class="text-left py-3">Funder Address</th>
+                            <th class="text-right py-3">Volume</th>
+                            <th class="text-right py-3">P&L</th>
+                            <th class="text-right py-3">Trades</th>
+                            <th class="text-center py-3">Status</th>
                         </tr>
                     </thead>
-                    <tbody id="tradesTable">
-                        <!-- Trades will be dynamically inserted here -->
+                    <tbody id="walletTableBody">
+                        <tr><td colspan="6" class="text-center py-8">
+                            <div class="loading inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                            <div class="mt-2">Loading from Polymarket API...</div>
+                        </td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
 
-    <!-- Registration Modal -->
-    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-        <div class="glass-effect rounded-lg p-8 max-w-md w-full mx-4 animate__animated animate__zoomIn">
-            <h2 class="text-2xl font-bold text-white mb-6">
-                <i class="fas fa-robot mr-2"></i>Register Your Bot
-            </h2>
+        <!-- Contact Section -->
+        <div class="mt-6 bg-gradient-to-r from-purple-800 to-blue-800 rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-3 text-center">💬 Contact for Try Market UP/DOWN</h2>
+            <p class="text-center text-gray-200 mb-4">Interested in automated crypto trading? Send us your details!</p>
 
-            <div class="mb-6">
-                <div class="bg-blue-900 bg-opacity-50 rounded-lg p-4 mb-4">
-                    <p class="text-white text-sm mb-2">
-                        <i class="fas fa-shield-alt mr-2 text-green-400"></i>
-                        <strong>Secure Registration via Telegram</strong>
-                    </p>
-                    <p class="text-gray-300 text-sm">
-                        For security reasons, API keys and private keys must be submitted through our Telegram bot.
-                        They will be automatically deleted after processing.
-                    </p>
-                </div>
-
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-white text-sm mb-2 block">Step 1: Get Your User ID</label>
-                        <div class="bg-gray-800 rounded-lg p-3">
-                            <code class="text-green-400 text-sm">UserID: <span id="userId" class="select-all">generating...</span></code>
-                            <button onclick="copyUserId()" class="ml-2 text-blue-400 hover:text-blue-300">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="text-white text-sm mb-2 block">Step 2: Open Telegram Bot</label>
-                        <a href="https://t.me/PolymarketTradingBot" target="_blank"
-                           class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg block text-center transition">
-                            <i class="fab fa-telegram mr-2"></i>@PolymarketTradingBot
-                        </a>
-                    </div>
-
-                    <div>
-                        <label class="text-white text-sm mb-2 block">Step 3: Send Registration Command</label>
-                        <div class="bg-gray-800 rounded-lg p-3 text-gray-300 text-sm">
-                            <code>/register [UserID]</code><br>
-                            Then follow the bot's instructions to securely submit your credentials.
-                        </div>
-                    </div>
-                </div>
+            <div class="mt-4 text-center text-sm text-gray-300">
+                <p>📬 Email: <a href="mailto:polymarket.up.down@gmail.com" class="text-blue-300 hover:text-blue-200">polymarket.up.down@gmail.com</a></p>
             </div>
+        </div>
 
-            <div class="flex justify-end space-x-3">
-                <button onclick="closeRegisterModal()"
-                        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition">
-                    Cancel
-                </button>
-                <button onclick="checkRegistration()"
-                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">
-                    <i class="fas fa-check mr-2"></i>Verify Registration
-                </button>
-            </div>
+        <!-- Footer -->
+        <div class="mt-6 text-center text-gray-400 text-sm">
+            <p>📡 Data from: data-api.polymarket.com | Using polymarket-apis v0.4.2</p>
+            <p class="mt-2">🤖 Automated Bot Trading BTC/ETH/SOL/XRP UP/DOWN Markets</p>
         </div>
     </div>
 
-    <!-- Wallet Settings Modal -->
-    <div id="walletModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-        <div class="glass-effect rounded-lg p-8 max-w-lg w-full mx-4 animate__animated animate__zoomIn">
-            <h2 class="text-2xl font-bold text-white mb-6">
-                <i class="fas fa-cog mr-2"></i>Wallet Settings
-            </h2>
+    <script>
+        function formatCurrency(amount) {
+            if (amount === null || amount === undefined) return '$0.00';
+            const prefix = amount < 0 ? '-$' : '$';
+            return prefix + Math.abs(amount).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
 
-            <form id="walletSettingsForm" class="space-y-4">
-                <input type="hidden" id="walletId">
+        function formatAddress(address) {
+            return address.slice(0, 6) + '...' + address.slice(-4);
+        }
 
-                <div>
-                    <label class="text-white text-sm mb-2 block">Wallet Address</label>
-                    <input type="text" id="walletAddress" readonly
-                           class="w-full bg-gray-800 text-gray-400 rounded-lg p-3">
-                </div>
+        async function refreshData() {
+            try {
+                const response = await fetch('/api/wallets');
+                const result = await response.json();
+                const data = JSON.parse(result.body);
 
-                <div>
-                    <label class="text-white text-sm mb-2 block">Trading Pair</label>
-                    <select id="tradingPair" class="w-full bg-gray-800 text-white rounded-lg p-3">
-                        <option value="auto">Auto (Balanced)</option>
-                        <option value="up">Always UP</option>
-                        <option value="down">Always DOWN</option>
-                        <option value="disabled">Disabled</option>
-                    </select>
-                </div>
+                // Update summary
+                document.getElementById('totalVolume').textContent = formatCurrency(data.summary.total_volume);
+                document.getElementById('totalPnL').textContent = formatCurrency(data.summary.total_pnl);
+                document.getElementById('totalPnL').className = data.summary.total_pnl >= 0 ?
+                    'text-3xl font-bold text-green-400' : 'text-3xl font-bold text-red-400';
+                document.getElementById('totalTrades').textContent = data.summary.total_trades.toLocaleString();
+                document.getElementById('activeWallets').textContent = data.summary.active_wallets;
 
-                <div>
-                    <label class="text-white text-sm mb-2 block">Order Amount (USDC)</label>
-                    <input type="number" id="orderAmount" min="1" max="1000" step="0.1"
-                           class="w-full bg-gray-800 text-white rounded-lg p-3"
-                           placeholder="5.0">
-                </div>
+                // Update table
+                const tbody = document.getElementById('walletTableBody');
+                tbody.innerHTML = '';
 
-                <div>
-                    <label class="text-white text-sm mb-2 block">Max Daily Volume (USDC)</label>
-                    <input type="number" id="maxDailyVolume" min="10" max="10000" step="10"
-                           class="w-full bg-gray-800 text-white rounded-lg p-3"
-                           placeholder="500">
-                </div>
+                data.wallets.forEach((wallet) => {
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-gray-700 hover:bg-gray-750';
 
-                <div class="flex items-center space-x-3">
-                    <input type="checkbox" id="autoClaimEnabled" class="w-4 h-4">
-                    <label for="autoClaimEnabled" class="text-white text-sm">Enable Auto-Claim</label>
-                </div>
-            </form>
+                    const pnlClass = wallet.pnl >= 0 ? 'text-green-400' : 'text-red-400';
+                    const statusClass = wallet.status === 'Active' ? 'text-green-400' : 'text-gray-500';
+                    const statusIcon = wallet.status === 'Active' ? '🟢' : '⚫';
 
-            <div class="flex justify-end space-x-3 mt-6">
-                <button onclick="closeWalletModal()"
-                        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition">
-                    Cancel
-                </button>
-                <button onclick="saveWalletSettings()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
-                    <i class="fas fa-save mr-2"></i>Save Settings
-                </button>
-            </div>
-        </div>
-    </div>
+                    row.innerHTML = `
+                        <td class="py-3 font-semibold">
+                            ${wallet.number === 1 ? '👑 ' : ''}Wallet ${wallet.number}
+                        </td>
+                        <td class="py-3">
+                            <a href="https://polymarket.com/profile/${wallet.funder}"
+                               target="_blank"
+                               class="text-blue-400 hover:text-blue-300">
+                                ${formatAddress(wallet.funder)}
+                            </a>
+                        </td>
+                        <td class="text-right py-3 font-semibold">${formatCurrency(wallet.volume)}</td>
+                        <td class="text-right py-3 font-bold ${pnlClass}">${formatCurrency(wallet.pnl)}</td>
+                        <td class="text-right py-3">${wallet.trades.toLocaleString()}</td>
+                        <td class="text-center py-3">
+                            <span class="${statusClass}">${statusIcon} ${wallet.status}</span>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
 
-    <script src="dashboard.js"></script>
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error loading data: ' + error.message);
+            }
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(refreshData, 30000);
+
+        // Initial load
+        window.addEventListener('DOMContentLoaded', refreshData);
+    </script>
 </body>
 </html>
