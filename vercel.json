@@ -1,14 +1,14 @@
 {
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "python3.9",
-      "maxDuration": 60
-    }
-  },
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/wallets",
-      "destination": "/api/wallets.py"
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/wallets",
+      "dest": "/api/wallets.py"
     }
   ]
 }
