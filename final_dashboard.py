@@ -59,7 +59,17 @@ HTML_TEMPLATE = '''
     <div class="container mx-auto p-4">
         <!-- Header -->
         <div class="bg-gradient-to-r from-green-700 to-blue-700 rounded-lg p-6 mb-6">
-            <h1 class="text-4xl font-bold mb-2">🎯 Polymarket Up Down Bot Dashboard</h1>
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-4">
+                    <img src="/logoupdown.png" alt="Logo" class="w-16 h-16 rounded-lg">
+                    <h1 class="text-4xl font-bold">Polymarket Up Down Bot Dashboard</h1>
+                </div>
+                <a href="https://t.me/polymarketupdownbot"
+                   target="_blank"
+                   class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-bold text-lg shadow-lg transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap">
+                    📱 Register via Telegram
+                </a>
+            </div>
             <p class="text-gray-200">Automated trading bot for crypto UP/DOWN markets - Real-time monitoring across 12 wallets</p>
             <div class="mt-3 text-sm text-gray-100">
                 <p>🤖 Auto-trading BTC, ETH, SOL, XRP UP/DOWN markets | 📊 Live data every 30 seconds | ⚡ 24/7 Operation</p>
@@ -117,39 +127,11 @@ HTML_TEMPLATE = '''
             </div>
         </div>
 
-        <!-- Contact Section -->
-        <div class="mt-6 bg-gradient-to-r from-purple-800 to-blue-800 rounded-lg p-6">
-            <h2 class="text-2xl font-bold mb-3 text-center">💬 Contact for Try Market UP/DOWN</h2>
-            <p class="text-center text-gray-200 mb-4">Interested in automated crypto trading? Send us your details!</p>
-
-            <form id="contactForm" class="max-w-lg mx-auto" onsubmit="return false;">
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-2">Your Email</label>
-                    <input type="email" id="userEmail" required
-                           class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white focus:outline-none focus:border-blue-500"
-                           placeholder="your.email@example.com">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-2">Message (Optional)</label>
-                    <textarea id="userMessage" rows="3"
-                              class="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white focus:outline-none focus:border-blue-500"
-                              placeholder="Tell us about your trading needs..."></textarea>
-                </div>
-                <button type="submit"
-                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition">
-                    📧 Send Contact Request
-                </button>
-            </form>
-
-            <div class="mt-4 text-center text-sm text-gray-300">
-                <p>📬 Direct Email: <a href="mailto:polymarket.up.down@gmail.com" class="text-blue-300 hover:text-blue-200">polymarket.up.down@gmail.com</a></p>
-            </div>
-        </div>
-
         <!-- Footer -->
         <div class="mt-6 text-center text-gray-400 text-sm">
             <p>📡 Data from: data-api.polymarket.com | Using polymarket-apis v0.4.2</p>
             <p class="mt-2">🤖 Automated Bot Trading BTC/ETH/SOL/XRP UP/DOWN Markets</p>
+            <p class="mt-2">📬 Direct Email: <a href="mailto:polymarket.up.down@gmail.com" class="text-blue-400 hover:text-blue-300">polymarket.up.down@gmail.com</a></p>
         </div>
     </div>
 
@@ -328,6 +310,12 @@ def fetch_wallet_stats(funder_address):
 def index():
     """Serve the dashboard"""
     return render_template_string(HTML_TEMPLATE)
+
+@app.route('/logoupdown.png')
+def logo():
+    """Serve the logo image"""
+    from flask import send_file
+    return send_file('logoupdown.png', mimetype='image/png')
 
 @app.route('/api/send-contact', methods=['POST'])
 def send_contact():
