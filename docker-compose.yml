@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: polymarket-api
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=sqlite:///dashboard.db
+      - REDIS_URL=redis://redis:6379
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - API_BASE_URL=http://backend:5000/api
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - polymarket-network
+
+  # Telegram Bot Service
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.telegram
+    container_name: polymarket-telegram-bot
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - API_BASE_URL=http://backend:5000/api
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - polymarket-network
+
+  # Frontend Web Server
+  frontend:
+    image: nginx:alpine
+    container_name: polymarket-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+      - ./dashboard.js:/usr/share/nginx/html/dashboard.js:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - polymarket-network
+
+  # Redis for caching and real-time updates
+  redis:
+    image: redis:alpine
+    container_name: polymarket-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - polymarket-network
+
+  # Trading Bot Service (Main Bot)
+  trading-bot:
+    build:
+      context: ../
+      dockerfile: Dockerfile.bot
+    container_name: polymarket-trading-bot
+    environment:
+      - API_KEY_1=${API_KEY_1}
+      - API_SECRET_1=${API_SECRET_1}
+      - API_PASSPHRASE_1=${API_PASSPHRASE_1}
+      - WALLET1_PRIVATE_KEY=${WALLET1_PRIVATE_KEY}
+      - WALLET1_FUNDER=${WALLET1_FUNDER}
+      - WALLET1_ADDRESS=${WALLET1_ADDRESS}
+      # Add more wallet credentials as needed
+      - DASHBOARD_API_URL=http://backend:5000/api
+      - BUILDER_API_KEY=${BUILDER_API_KEY}
+      - BUILDER_SECRET=${BUILDER_SECRET}
+      - BUILDER_PASSPHRASE=${BUILDER_PASSPHRASE}
+    volumes:
+      - ../config.json:/app/config.json:ro
+      - ./bot-data:/app/data
+      - ./bot-logs:/app/logs
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - polymarket-network
+
+networks:
+  polymarket-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+    driver: local
